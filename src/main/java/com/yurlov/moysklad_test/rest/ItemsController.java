@@ -24,7 +24,7 @@ import java.util.List;
 @RequestMapping("/items")
 public class ItemsController {
 
-    private List<Item> items= new ArrayList<>();
+    private final List<Item> items= new ArrayList<>();
 
     @GetMapping
     public List<Item> getItems() {
