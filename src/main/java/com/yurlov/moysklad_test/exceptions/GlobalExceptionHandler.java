@@ -1,4 +1,4 @@
-package com.yurlov.moysklad_test.rest;
+package com.yurlov.moysklad_test.exceptions;
 
 import jakarta.validation.ValidationException;
 import lombok.AllArgsConstructor;
