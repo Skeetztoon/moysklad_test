@@ -5,6 +5,10 @@ import com.yurlov.moysklad_test.domain.item.Item;
 import jakarta.validation.Valid;
 import jakarta.validation.ValidationException;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.PageRequest;
+
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.BindingResult;
@@ -17,6 +21,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.client.ResourceAccessException;
 
 import java.util.List;
@@ -30,8 +35,24 @@ public class ItemsController {
     private final ItemRepository itemRepository;
 
     @GetMapping
-    public List<Item> getItems() {
-        return itemRepository.findAll();
+    public ResponseEntity<List<Item>> getItems(
+        @RequestParam(required = false) String name,
+        @RequestParam(required = false) Double minPrice,
+        @RequestParam(required = false) Double maxPrice,
+        @RequestParam(required = false) Boolean inStock,
+        @RequestParam(defaultValue = "name") String sortBy,
+        @RequestParam(defaultValue = "asc") String order,
+        @RequestParam(defaultValue = "5") int limit) {
+
+        Sort sort = Sort.by(Sort.Direction.ASC, sortBy);
+        if (order.equals("desc")) {
+            sort = Sort.by(Sort.Direction.DESC, sortBy);
+        }
+        Pageable pageable = PageRequest.of(0, limit, sort);
+
+        List<Item> items = itemRepository.findByFilters(name, minPrice, maxPrice, inStock, pageable);
+
+        return ResponseEntity.ok(items);
     }
 
     @GetMapping("/{id}")
