@@ -1,4 +1,4 @@
-package com.yurlov.moysklad_test.domain.item;
+package com.yurlov.moysklad_test.domain;
 
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
@@ -8,6 +8,7 @@ import jakarta.persistence.GenerationType;
 import jakarta.persistence.SequenceGenerator;
 import jakarta.persistence.Column;
 import jakarta.validation.constraints.DecimalMin;
+import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Size;
 import lombok.AllArgsConstructor;
@@ -38,4 +39,6 @@ public class Item {
     @Column(name = "instock")
     private boolean inStock = false;
 
+    @Min(value = 0, message = "Количество не может быть отрицательным")
+    private int quantity;
 }

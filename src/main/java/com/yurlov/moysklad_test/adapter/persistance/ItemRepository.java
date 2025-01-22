@@ -1,6 +1,6 @@
-package com.yurlov.moysklad_test.adapter.persistance.item;
+package com.yurlov.moysklad_test.adapter.persistance;
 
-import com.yurlov.moysklad_test.domain.item.Item;
+import com.yurlov.moysklad_test.domain.Item;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;

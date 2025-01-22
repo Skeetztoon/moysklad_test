@@ -1,7 +1,7 @@
 package com.yurlov.moysklad_test.persistance;
 
-import com.yurlov.moysklad_test.adapter.persistance.item.ItemRepository;
-import com.yurlov.moysklad_test.domain.item.Item;
+import com.yurlov.moysklad_test.adapter.persistance.ItemRepository;
+import com.yurlov.moysklad_test.domain.Item;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.runner.RunWith;
@@ -22,21 +22,21 @@ import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 @AutoConfigureTestDatabase(replace = AutoConfigureTestDatabase.Replace.NONE)
 class ItemRepositoryTest {
 
+    private final static Item ITEM_1 = new Item(null, "Монитор", "Описание 1", 10.0, true, 0);
+    private final static Item ITEM_2 = new Item(null, "Стул", "Описание 2", 20.0, true, 0);
+
     @Autowired
     private ItemRepository itemRepository;
 
     @BeforeEach
     public void setUp() {
         itemRepository.deleteAll();
+        itemRepository.save(ITEM_1);
+        itemRepository.save(ITEM_2);
     }
 
     @Test
     void findByNameTest() {
-        Item item1 = new Item(null, "Монитор", "Описание 1", 10.0, true);
-        Item item2 = new Item(null, "Стул", "Описание 2", 20.0, true);
-        itemRepository.save(item1);
-        itemRepository.save(item2);
-
         List<Item> items = itemRepository.findByFilters("Монитор", null, null, null, Pageable.unpaged());
 
         assertThat(items.size()).isEqualTo(1);
@@ -45,11 +45,6 @@ class ItemRepositoryTest {
 
     @Test
     void findByPriceRangeTest() {
-        Item item1 = new Item(null, "Монитор", "Описание 1", 10.0, true);
-        Item item2 = new Item(null, "Стул", "Описание 2", 20.0, true);
-        itemRepository.save(item1);
-        itemRepository.save(item2);
-
         List<Item> items = itemRepository.findByFilters(null, 15.0, null, null, Pageable.unpaged());
 
         assertThat(items.size()).isEqualTo(1);
@@ -58,11 +53,6 @@ class ItemRepositoryTest {
 
     @Test
     void sortByPriceTest() {
-        Item item1 = new Item(null, "Монитор", "Описание 1", 10.0, true);
-        Item item2 = new Item(null, "Стул", "Описание 2", 20.0, true);
-        itemRepository.save(item1);
-        itemRepository.save(item2);
-
         List<Item> items = itemRepository.findByFilters(null, null, null, null, PageRequest.of(0, 10, Sort.by("price")));
 
         assertThat(items.get(0).getName()).isEqualTo("Монитор");

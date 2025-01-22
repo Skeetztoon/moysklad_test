@@ -1,8 +1,8 @@
 package com.yurlov.moysklad_test.rest;
 
-import com.yurlov.moysklad_test.adapter.persistance.item.ItemRepository;
-import com.yurlov.moysklad_test.adapter.rest.item.ItemsController;
-import com.yurlov.moysklad_test.domain.item.Item;
+import com.yurlov.moysklad_test.adapter.persistance.ItemRepository;
+import com.yurlov.moysklad_test.adapter.rest.ItemsController;
+import com.yurlov.moysklad_test.domain.Item;
 import jakarta.persistence.EntityManager;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
