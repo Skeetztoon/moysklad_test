@@ -32,8 +32,10 @@ public class DeliveriesController extends ControllerTemplate<Delivery> {
     public ResponseEntity<Delivery> create(@Valid @RequestBody Delivery item, BindingResult bindingResult) {
         validate(bindingResult);
 
+        itemService.addQuantity(item.getItem().getId(), item.getQuantity());
+
         Delivery delivery = deliveryRepository.save(item);
-        itemService.addQuantity(delivery.getItem().getId(), item.getQuantity());
+
 
         return ResponseEntity.status(HttpStatus.CREATED).body(delivery);
     }

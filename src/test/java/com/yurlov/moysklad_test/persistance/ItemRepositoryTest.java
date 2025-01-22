@@ -22,17 +22,17 @@ import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 @AutoConfigureTestDatabase(replace = AutoConfigureTestDatabase.Replace.NONE)
 class ItemRepositoryTest {
 
-    private final static Item ITEM_1 = new Item(null, "Монитор", "Описание 1", 10.0, true, 0);
-    private final static Item ITEM_2 = new Item(null, "Стул", "Описание 2", 20.0, true, 0);
-
     @Autowired
     private ItemRepository itemRepository;
 
     @BeforeEach
     public void setUp() {
         itemRepository.deleteAll();
-        itemRepository.save(ITEM_1);
-        itemRepository.save(ITEM_2);
+        Item item1 = new Item(null, "Монитор", "Описание 1", 10.0, true, 0);
+        Item item2 = new Item(null, "Стул", "Описание 2", 20.0, true, 0);
+
+        itemRepository.save(item1);
+        itemRepository.save(item2);
     }
 
     @Test
