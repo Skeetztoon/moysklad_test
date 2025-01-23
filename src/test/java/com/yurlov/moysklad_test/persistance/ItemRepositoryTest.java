@@ -58,4 +58,3 @@ class ItemRepositoryTest {
         assertThat(items.get(0).getName()).isEqualTo("Монитор");
     }
 }
-

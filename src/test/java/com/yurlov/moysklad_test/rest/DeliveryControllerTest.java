@@ -1,7 +1,9 @@
 package com.yurlov.moysklad_test.rest;
 
+import com.yurlov.moysklad_test.adapter.persistance.DeliveryRepository;
 import com.yurlov.moysklad_test.adapter.persistance.ItemRepository;
-import com.yurlov.moysklad_test.adapter.rest.item.ItemsController;
+import com.yurlov.moysklad_test.adapter.rest.delivery.DeliveriesController;
+import com.yurlov.moysklad_test.domain.Delivery;
 import com.yurlov.moysklad_test.domain.Item;
 import jakarta.persistence.EntityManager;
 import org.junit.jupiter.api.BeforeEach;
@@ -14,26 +16,27 @@ import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.transaction.annotation.Transactional;
 
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @SpringBootTest
 @AutoConfigureMockMvc
 @Transactional
-class ItemsControllerTest {
+class DeliveryControllerTest {
 
-    private static final String BASE_URI = "/items";
-    public static final String FIRST_URI = "/items/1";
+    private static final String BASE_URI = "/deliveries";
+    private static final String FIRST_URI = "/deliveries/1";
 
     @Autowired
-    private ItemsController controller;
+    private DeliveriesController controller;
 
     @Autowired
     private ItemRepository itemRepository;
+
+    @Autowired
+    private DeliveryRepository deliveryRepository;
 
     private MockMvc mockMvc;
 
@@ -54,49 +57,58 @@ class ItemsControllerTest {
         item.setPrice(100.0);
 
         itemRepository.save(item);
+
+        Delivery delivery = new Delivery(null,"Delivery 1", item, 10);
+
+        deliveryRepository.save(delivery);
     }
 
     private void resetAutoIncrement() {
         String sql = "ALTER SEQUENCE item_id RESTART WITH 1";
+        String sql1 = "ALTER SEQUENCE delivery_id RESTART WITH 1";
         entityManager.createNativeQuery(sql).executeUpdate();
+        entityManager.createNativeQuery(sql1).executeUpdate();
     }
+
 
 
     @Test
     void testGetAll() throws Exception {
         mockMvc.perform(get(BASE_URI))
             .andExpect(status().isOk())
-            .andExpect(jsonPath("$[0].name").value("Item 1"));
+            .andExpect(jsonPath("$[0].title").value("Delivery 1"));
     }
 
     @Test
     void testGetOne() throws Exception {
         mockMvc.perform(get(FIRST_URI))
             .andExpect(status().isOk())
-        .andExpect(jsonPath("$.name").value("Item 1"));
+            .andExpect(jsonPath("$.title").value("Delivery 1"))
+            .andExpect(jsonPath("$.itemId").value("1"));
     }
+
 
     @Test
     void testCreate() throws Exception {
-        String json = "{\"name\":\"test\",\"description\":\"test\",\"price\": 10.0}";
+        String json = "{\"title\": \"Test delivery\",\"item\": {\"id\": 1},\"quantity\": 5}";
 
         mockMvc.perform(post(BASE_URI)
-            .contentType(MediaType.APPLICATION_JSON)
-            .content(json))
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(json))
             .andExpect(status().isCreated())
-            .andExpect(jsonPath("$.name").value("test"));
+            .andExpect(jsonPath("$.title").value("Test delivery"));
     }
 
     @Test
     void testUpdate() throws Exception {
-        String json = "{\"name\":\"updated item\",\"description\":\"test\",\"price\": 10.0}";
+
+        String json = "{\"title\":\"Updated delivery\",\"item\": {\"id\": 1},\"quantity\": 5}";
 
         mockMvc.perform(put(FIRST_URI)
-            .contentType(MediaType.APPLICATION_JSON)
-            .content(json))
-
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(json))
             .andExpect(status().isOk())
-            .andExpect(jsonPath("$.name").value("updated item"));
+            .andExpect(jsonPath("$.title").value("Updated delivery"));
     }
 
     @Test

@@ -1,6 +1,7 @@
-package com.yurlov.moysklad_test.adapter.rest;
+package com.yurlov.moysklad_test.adapter.rest.sale;
 
 import com.yurlov.moysklad_test.adapter.persistance.SaleRepository;
+import com.yurlov.moysklad_test.adapter.rest.ControllerTemplate;
 import com.yurlov.moysklad_test.app.ItemService;
 import com.yurlov.moysklad_test.domain.Sale;
 import jakarta.validation.Valid;
@@ -15,7 +16,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 @RestController
 @RequestMapping("/sales")
-public class SalesController extends ControllerTemplate<Sale>{
+public class SalesController extends ControllerTemplate<Sale, SaleDTO> {
 
     private final SaleRepository saleRepository;
     private final ItemService itemService;
@@ -29,14 +30,28 @@ public class SalesController extends ControllerTemplate<Sale>{
     @Override
     @PostMapping
     @Transactional
-    public ResponseEntity<Sale> create(@Valid @RequestBody Sale item, BindingResult bindingResult) {
+    public ResponseEntity<SaleDTO> create(@Valid @RequestBody Sale item, BindingResult bindingResult) {
         validate(bindingResult);
 
         itemService.subtractQuantity(item.getItem().getId(), item.getQuantity());
 
         Sale sale = saleRepository.save(item);
 
+        SaleDTO saleDTO = convertToResponse(sale);
 
-        return ResponseEntity.status(HttpStatus.CREATED).body(sale);
+        return ResponseEntity.status(HttpStatus.CREATED).body(saleDTO);
+    }
+
+    //////////////////
+
+    @Override
+    protected SaleDTO convertToResponse(Sale sale) {
+        SaleDTO saleDTO = new SaleDTO();
+        saleDTO.setId(sale.getId());
+        saleDTO.setTitle(sale.getTitle());
+        saleDTO.setItemId(sale.getItem().getId());
+        saleDTO.setQuantity(sale.getQuantity());
+        saleDTO.setPrice(sale.getPrice());
+        return saleDTO;
     }
 }

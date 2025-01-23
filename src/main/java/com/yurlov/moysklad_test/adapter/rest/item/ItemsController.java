@@ -1,6 +1,7 @@
-package com.yurlov.moysklad_test.adapter.rest;
+package com.yurlov.moysklad_test.adapter.rest.item;
 
 import com.yurlov.moysklad_test.adapter.persistance.ItemRepository;
+import com.yurlov.moysklad_test.adapter.rest.ControllerTemplate;
 import com.yurlov.moysklad_test.domain.Item;
 
 import org.springframework.data.domain.PageRequest;
@@ -16,7 +17,7 @@ import java.util.List;
 
 @RestController
 @RequestMapping("/items")
-public class ItemsController extends ControllerTemplate<Item>{
+public class ItemsController extends ControllerTemplate<Item, Item> {
 
     private final ItemRepository itemRepository;
 
@@ -45,5 +46,12 @@ public class ItemsController extends ControllerTemplate<Item>{
         List<Item> items = itemRepository.findByFilters(name, minPrice, maxPrice, inStock, pageable);
 
         return ResponseEntity.ok(items);
+    }
+
+    //////////////////
+
+    @Override
+    protected Item convertToResponse(Item item) {
+        return item;
     }
 }

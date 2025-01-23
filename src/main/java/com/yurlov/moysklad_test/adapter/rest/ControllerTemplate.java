@@ -19,13 +19,13 @@ import java.util.List;
 import java.util.Optional;
 
 @RequiredArgsConstructor
-public abstract class ControllerTemplate<T> {
+public abstract class ControllerTemplate<T, R> {
 
     private final JpaRepository<T, Integer> repository;
 
 
     @GetMapping
-    public ResponseEntity<List<T>> getAll(@RequestParam(required = false) String name,
+    public ResponseEntity<List<R>> getAll(@RequestParam(required = false) String name,
         @RequestParam(required = false) Double minPrice,
         @RequestParam(required = false) Double maxPrice,
         @RequestParam(required = false) Boolean inStock,
@@ -34,39 +34,48 @@ public abstract class ControllerTemplate<T> {
         @RequestParam(defaultValue = "5") int limit) {
 
         List<T> items = repository.findAll();
+        List<R> dtos = items.stream().map(this::convertToResponse).toList();
 
-        return ResponseEntity.ok(items);
+        return ResponseEntity.ok(dtos);
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<T> getById(@PathVariable int id) {
+    public ResponseEntity<R> getById(@PathVariable int id) {
         Optional<T> item = repository.findById(id);
 
         if (item.isEmpty()) {
             throw new ResourceAccessException("id " + id + " not found");
         }
-        return ResponseEntity.ok(item.get());
+
+        R dto = convertToResponse(item.get());
+
+        return ResponseEntity.ok(dto);
     }
 
     @PostMapping
-    public ResponseEntity<T> create(@Valid @RequestBody T item, BindingResult bindingResult) {
+    public ResponseEntity<R> create(@Valid @RequestBody T item, BindingResult bindingResult) {
         validate(bindingResult);
 
         T savedItem = repository.save(item);
 
-        return ResponseEntity.status(HttpStatus.CREATED).body(savedItem);
+        R dto = convertToResponse(savedItem);
+
+        return ResponseEntity.status(HttpStatus.CREATED).body(dto);
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<String> update(@PathVariable int id, @Valid @RequestBody T item, BindingResult bindingResult) {
+    public ResponseEntity<R> update(@PathVariable int id, @Valid @RequestBody T item, BindingResult bindingResult) {
         validate(bindingResult);
 
         if (!repository.existsById(id)) {
             throw new ResourceAccessException("id " + id + " not found");
         }
+
         setId(item, id);
-        repository.save(item);
-        return ResponseEntity.ok("Updated");
+        T savedItem = repository.save(item);
+        R dto = convertToResponse(savedItem);
+
+        return ResponseEntity.ok(dto);
     }
 
     @DeleteMapping("/{id}")
@@ -80,6 +89,8 @@ public abstract class ControllerTemplate<T> {
     }
 
     //////////////////////////
+
+    protected abstract R convertToResponse(T item);
 
     protected void validate(BindingResult bindingResult) {
         if (bindingResult.hasErrors()) {
@@ -100,5 +111,4 @@ public abstract class ControllerTemplate<T> {
             ((Item) item).setId(id);
         }
     }
-
 }
