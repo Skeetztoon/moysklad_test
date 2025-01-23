@@ -1,4 +1,4 @@
-## API Reference
+## API Reference - Items
 
 #### Получить список товаров
 
@@ -37,4 +37,49 @@
 
 `
   DELETE /items/${id}
+`
+
+## API Reference - Deliveries, Sales 
+
+#### Получить список документов
+
+`
+  GET /deliveries  
+`
+`
+  GET /sales  
+`
+
+#### Получить один документ
+
+`
+  GET /deliveries/${id}
+`
+`
+  GET /sales/${id}
+`
+
+#### Создать документ
+
+`
+  POST /deliveries
+`
+`
+  POST /sales
+`
+#### Обновить документ
+
+`
+  PUT /deliveries/${id}
+`
+`
+  PUT /sales/${id}
+`
+#### Удалить документ
+
+`
+  DELETE /deliveries/${id}
+`
+`
+  DELETE /sales/${id}
 `
